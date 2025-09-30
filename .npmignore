@@ -1,0 +1,7 @@
+src/
+node_modules/
+.git/
+*.test.js
+rollup.config.js
+.eslintrc.js
+jest.config.js
