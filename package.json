@@ -1,6 +1,6 @@
 {
   "name": "infinite-text-scroller",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A modern, lightweight infinite text scroller library with factory pattern and zero dependencies",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
