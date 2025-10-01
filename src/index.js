@@ -1,7 +1,10 @@
 /**
- * 무한 텍스트 스크롤러 팩토리
- * 무한 스크롤 텍스트 애니메이션 생성을 위한 현대적이고 가벼운 라이브러리
+ * 무한 텍스트 스크롤러
  * @version 1.0.0
+ * @author deep
+ * @description 무한 스크롤 텍스트 애니메이션을 위한 경량 라이브러리
+ * @repository https://github.com/deep/infinite-text-scroller
+ * @license MIT
  */
 
 export class InfiniteTextScroller {
@@ -521,12 +524,20 @@ export const destroyAllScrollers = InfiniteTextScroller.destroyAll.bind(Infinite
 export const pauseAllScrollers = InfiniteTextScroller.pauseAll.bind(InfiniteTextScroller);
 export const playAllScrollers = InfiniteTextScroller.playAll.bind(InfiniteTextScroller);
 
+// UMD 빌드 지원
 (function (global, factory) {
   if (typeof module === "object" && typeof module.exports === "object") {
     module.exports = factory();
   } else {
     global.InfiniteTextScroller = factory();
   }
-})(typeof window !== "undefined" ? window : this, function () {
-  return InfiniteTextScroller;
-});
+})(
+  typeof globalThis !== "undefined" ? globalThis
+    : typeof window !== "undefined" ? window
+    : typeof global !== "undefined" ? global
+    : typeof self !== "undefined" ? self
+    : Function("return this")(),
+  function () {
+    return InfiniteTextScroller;
+  }
+);
