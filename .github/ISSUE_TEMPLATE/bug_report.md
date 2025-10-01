@@ -1,5 +1,5 @@
 ---
-name: [BUG] 버그 리포트
+name: 버그
 about: 동작하지 않거나 예상과 다른 동작을 보고합니다.
 title: "[BUG] "
 labels: bug
