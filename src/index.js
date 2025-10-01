@@ -1,13 +1,13 @@
 /**
  * 무한 텍스트 스크롤러
- * @version 1.0.0
+ * @version 1.1.0
  * @author deep
  * @description 무한 스크롤 텍스트 애니메이션을 위한 경량 라이브러리
  * @license MIT
  */
 
 export class InfiniteTextScroller {
-  static VERSION = '1.0.0';
+  static VERSION = '1.1.0';
   static instances = new Map();
 
   static defaultConfig = {
