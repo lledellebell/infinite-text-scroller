@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-export class TextScrollerFactory {
+export class InfiniteTextScroller {
   static VERSION = '1.0.0';
   static instances = new Map();
 
@@ -57,8 +57,8 @@ export class TextScrollerFactory {
 
   // 비공개 헬퍼: 개별 스크롤러 아이템 생성
   static #createScrollerItem = (text, separator, direction, config) => {
-    const item = TextScrollerFactory.#createElement('div', 'its-scroller-item');
-    const textSpan = TextScrollerFactory.#createElement('span', 'its-scroller-text', text);
+    const item = InfiniteTextScroller.#createElement('div', 'its-scroller-item');
+    const textSpan = InfiniteTextScroller.#createElement('span', 'its-scroller-text', text);
     
     if (config.fontFamily) {
       textSpan.style.fontFamily = config.fontFamily;
@@ -67,7 +67,7 @@ export class TextScrollerFactory {
     item.appendChild(textSpan);
     
     if (direction === 'horizontal' && separator) {
-      const separatorSpan = TextScrollerFactory.#createElement('span', 'its-scroller-separator', separator);
+      const separatorSpan = InfiniteTextScroller.#createElement('span', 'its-scroller-separator', separator);
       if (config.separatorColor && config.separatorColor !== 'inherit') {
         separatorSpan.style.color = config.separatorColor;
       }
@@ -79,13 +79,13 @@ export class TextScrollerFactory {
 
   // 비공개 헬퍼: 복제된 스크롤러 트랙 생성
   static #createTrack = (text, separator, direction, duplicates, config) => {
-    const track = TextScrollerFactory.#createElement('div', 'its-scroller-track');
+    const track = InfiniteTextScroller.#createElement('div', 'its-scroller-track');
     const totalItems = duplicates * 2;
 
     const fragment = document.createDocumentFragment();
     Array.from({ length: totalItems }).forEach(() => {
       fragment.appendChild(
-        TextScrollerFactory.#createScrollerItem(text, separator, direction, config)
+        InfiniteTextScroller.#createScrollerItem(text, separator, direction, config)
       );
     });
     
@@ -178,7 +178,9 @@ export class TextScrollerFactory {
 
       .its-scroller-track {
         display: flex;
-        animation: its-scroll var(--its-animation-timing, linear) infinite;
+        animation-duration: var(--its-animation-speed, 20s);
+        animation-timing-function: var(--its-animation-timing, linear);
+        animation-iteration-count: infinite;
         animation-delay: var(--its-animation-delay, 0s);
         will-change: transform;
         backface-visibility: hidden;
@@ -259,7 +261,7 @@ export class TextScrollerFactory {
    * @returns {Object|null} 제어 메서드가 포함된 스크롤러 인스턴스
    */
   static create(options) {
-    const config = { ...TextScrollerFactory.defaultConfig, ...options };
+    const config = { ...InfiniteTextScroller.defaultConfig, ...options };
 
     // 필수 옵션 검증
     if (!config.containerId) {
@@ -279,7 +281,7 @@ export class TextScrollerFactory {
 
     // 스타일 주입 (활성화된 경우)
     if (config.autoInjectStyles) {
-      TextScrollerFactory.injectStyles();
+      InfiniteTextScroller.injectStyles();
     }
 
     // 컨테이너 클래스 추가
@@ -304,9 +306,9 @@ export class TextScrollerFactory {
       config.className
     ].filter(Boolean).join(' ');
 
-    const wrapper = TextScrollerFactory.#createElement('div', wrapperClasses);
+    const wrapper = InfiniteTextScroller.#createElement('div', wrapperClasses);
     
-    TextScrollerFactory.#applyStyles(wrapper, {
+    InfiniteTextScroller.#applyStyles(wrapper, {
       '--its-animation-speed': `${config.speed}s`,
       '--its-font-size': config.fontSize,
       '--its-font-weight': config.fontWeight,
@@ -324,7 +326,7 @@ export class TextScrollerFactory {
     });
 
     // 트랙 생성
-    const track = TextScrollerFactory.#createTrack(
+    const track = InfiniteTextScroller.#createTrack(
       config.text,
       config.separator,
       config.direction,
@@ -457,7 +459,7 @@ export class TextScrollerFactory {
 
       destroy: () => {
         wrapper.remove();
-        TextScrollerFactory.instances.delete(config.containerId);
+        InfiniteTextScroller.instances.delete(config.containerId);
       },
 
       getState: () => ({
@@ -467,7 +469,7 @@ export class TextScrollerFactory {
     };
 
     // 인스턴스 저장
-    TextScrollerFactory.instances.set(config.containerId, instance);
+    InfiniteTextScroller.instances.set(config.containerId, instance);
 
     return instance;
   }
@@ -478,14 +480,14 @@ export class TextScrollerFactory {
    * @returns {Object|undefined} 스크롤러 인스턴스
    */
   static getInstance(containerId) {
-    return TextScrollerFactory.instances.get(containerId);
+    return InfiniteTextScroller.instances.get(containerId);
   }
 
   /**
    * 모든 스크롤러 인스턴스 제거
    */
   static destroyAll() {
-    TextScrollerFactory.instances.forEach(instance => instance.destroy());
+    InfiniteTextScroller.instances.forEach(instance => instance.destroy());
   }
 
   /**
@@ -493,28 +495,38 @@ export class TextScrollerFactory {
    * @returns {Array} 스크롤러 인스턴스 배열
    */
   static getAllInstances() {
-    return Array.from(TextScrollerFactory.instances.values());
+    return Array.from(InfiniteTextScroller.instances.values());
   }
 
   /**
    * 모든 인스턴스 일시 정지
    */
   static pauseAll() {
-    TextScrollerFactory.instances.forEach(instance => instance.pause());
+    InfiniteTextScroller.instances.forEach(instance => instance.pause());
   }
 
   /**
    * 모든 인스턴스 재생
    */
   static playAll() {
-    TextScrollerFactory.instances.forEach(instance => instance.play());
+    InfiniteTextScroller.instances.forEach(instance => instance.play());
   }
 }
 
-export default TextScrollerFactory;
+export default InfiniteTextScroller;
 
-export const createScroller = TextScrollerFactory.create.bind(TextScrollerFactory);
-export const getScroller = TextScrollerFactory.getInstance.bind(TextScrollerFactory);
-export const destroyAllScrollers = TextScrollerFactory.destroyAll.bind(TextScrollerFactory);
-export const pauseAllScrollers = TextScrollerFactory.pauseAll.bind(TextScrollerFactory);
-export const playAllScrollers = TextScrollerFactory.playAll.bind(TextScrollerFactory);
+export const createScroller = InfiniteTextScroller.create.bind(InfiniteTextScroller);
+export const getScroller = InfiniteTextScroller.getInstance.bind(InfiniteTextScroller);
+export const destroyAllScrollers = InfiniteTextScroller.destroyAll.bind(InfiniteTextScroller);
+export const pauseAllScrollers = InfiniteTextScroller.pauseAll.bind(InfiniteTextScroller);
+export const playAllScrollers = InfiniteTextScroller.playAll.bind(InfiniteTextScroller);
+
+(function (global, factory) {
+  if (typeof module === "object" && typeof module.exports === "object") {
+    module.exports = factory();
+  } else {
+    global.InfiniteTextScroller = factory();
+  }
+})(typeof window !== "undefined" ? window : this, function () {
+  return InfiniteTextScroller;
+});

@@ -39,9 +39,9 @@ npm run build
 ### ES6 모듈
 
 ```js
-import TextScrollerFactory from 'infinite-text-scroller';
+import InfiniteTextScroller from 'infinite-text-scroller';
 
-const scroller = TextScrollerFactory.create({
+const scroller = InfiniteTextScroller.create({
   text: '안녕하세요',
   containerId: 'scroller',
   speed: 20,
@@ -55,7 +55,7 @@ const scroller = TextScrollerFactory.create({
 <div id="scroller"></div>
 <script src="node_modules/infinite-text-scroller/dist/index.js"></script>
 <script>
-  const scroller = TextScrollerFactory.create({
+  const scroller = InfiniteTextScroller.create({
     text: '안녕하세요',
     containerId: 'scroller'
   });
@@ -128,12 +128,12 @@ import 'infinite-text-scroller/dist/styles.css';
 모든 메서드는 체이닝을 지원합니다.
 
 ### 정적 메서드
-- TextScrollerFactory.getInstance(id) - ID로 인스턴스 가져오기
-- TextScrollerFactory.getAllInstances() - 모든 인스턴스 가져오기
-- TextScrollerFactory.destroyAll() - 모든 인스턴스 제거
-- TextScrollerFactory.pauseAll() - 모든 인스턴스 일시정지
-- TextScrollerFactory.playAll() - 모든 인스턴스 재생
-
+- InfiniteTextScroller.create(options) - 새 인스턴스 생성
+- InfiniteTextScroller.getInstance(id) - ID로 인스턴스 가져오기
+- InfiniteTextScroller.getAllInstances() - 모든 인스턴스 가져오기
+- InfiniteTextScroller.destroyAll() - 모든 인스턴스 제거
+- InfiniteTextScroller.pauseAll() - 모든 인스턴스 일시정지
+- InfiniteTextScroller.playAll() - 모든 인스턴스 재생
 
 ## 개발
 

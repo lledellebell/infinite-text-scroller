@@ -3,7 +3,7 @@ import terser from '@rollup/plugin-terser';
 
 const banner = `/*!
  * Infinite Text Scroller v1.0.0
- * (c) ${new Date().getFullYear()} Your Name
+ * (c) ${new Date().getFullYear()} deep
  * Released under the MIT License
  */`;
 

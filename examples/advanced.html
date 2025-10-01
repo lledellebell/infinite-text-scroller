@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> 스크롤러 예제</title>
+  <style>
+    body { font-family: sans-serif; background-color: #f0f2f5; color: #333; margin: 0;}
+    h1, h2 { text-align: center; color: #1a237e; }
+    .example-section { 
+      margin: 2rem auto;
+      padding: 2rem;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      max-width: 90%;
+    }
+  </style>
+</head>
+<body>
+
+  <h1> 스크롤러 사용 사례</h1>
+
+  <div class="example-section">
+    <h2>뉴스 티커</h2>
+    <div id="news-ticker"></div>
+  </div>
+
+  <div class="example-section">
+    <h2>프로모션 배너</h2>
+    <div id="promo-banner"></div>
+  </div>
+
+  <div class="example-section">
+    <h2>주식 시세 (자동 업데이트)</h2>
+    <div id="stock-ticker"></div>
+  </div>
+
+  <div class="example-section">
+    <h2>공지사항 (세로)</h2>
+    <div id="announcements" style="height: 150px;"></div>
+  </div>
+
+  <div class="example-section">
+    <h2>이벤트 배너 (지연 시작)</h2>
+    <div id="event-banner"></div>
+  </div>
+
+  <div class="example-section">
+    <h2>RTL 지원</h2>
+  </div>
+
+  <script src="../dist/index.js"></script>
+  <script>
+    // 1. 뉴스 티커
+    const newsTicker = InfiniteTextScroller.create({
+      containerId: 'news-ticker',
+      text: '속보: 새로운 무한 스크롤러 라이브러리 출시! 개발자들 사이에서 큰 인기.',
+      backgroundColor: '#1a237e',
+      textColor: '#ffffff',
+      fontSize: '1rem',
+    });
+
+    // 2. 프로모션 배너
+    const promoBanner = InfiniteTextScroller.create({
+      containerId: 'promo-banner',
+      text: '기간 한정 세일! 모든 상품 20% 할인!',
+      speed: 15,
+      fontSize: '2rem',
+      fontWeight: 'bold',
+      backgroundColor: '#ffc107',
+      textColor: '#000000',
+    });
+
+    // 3. 주식 시세 (자동 업데이스트)
+    const stockTicker = InfiniteTextScroller.create({
+      containerId: 'stock-ticker',
+      text: '코스피 2,800.12 ▲15.45 (+0.55%) | 나스닥 17,857.02 ▼32.23 (-0.18%)',
+      speed: 10,
+      pauseOnHover: false,
+    });
+    setInterval(() => {
+      const newPrice = (Math.random() * 100 - 50).toFixed(2);
+      const sign = newPrice >= 0 ? '▲' : '▼';
+      const change = Math.abs(newPrice);
+      const newText = `코스피 2,800.12 ${sign}${change} | 나스닥 17,857.02 ${sign === '▲' ? '▼' : '▲'}${change / 2}`; 
+      stockTicker.updateText(newText);
+    }, 5000);
+
+    // 4. 공지사항 (세로)
+    const announcements = InfiniteTextScroller.create({
+      containerId: 'announcements',
+      text: '시스템 점검 안내: 10월 5일 오전 2시 ~ 4시 | 새로운 기능 업데이스트 안내: 10월 10일 예정',
+      direction: 'vertical',
+      speed: 6,
+      padding: '0.5rem'
+    });
+
+    // 5. 이벤트 배너 (지연 시작)
+    const eventBanner = InfiniteTextScroller.create({
+      containerId: 'event-banner',
+      text: '곧 시작되는 이벤트! 놓치지 마세요!',
+      animationDelay: '3s',
+      backgroundColor: '#4caf50',
+      textColor: '#ffffff',
+      fontWeight: '500',
+    });
+
+    // 6. RTL 지원
+    const rtlScroller = InfiniteTextScroller.create({
+      containerId: 'rtl-scroller',
+      text: 'هذا مثال على التمرير من اليمين إلى اليسار.',
+      rtl: true,
+      fontFamily: 'Tahoma, Arial, sans-serif',
+      backgroundColor: '#333',
+    });
+  </script>
+
+</body>
+</html>
