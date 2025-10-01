@@ -1,5 +1,14 @@
 # Infinite Text Scroller
 
+<p align="center">
+  <img src="https://img.shields.io/npm/v/infinite-text-scroller?color=blue&label=npm" />
+  <img src="https://img.shields.io/bundlephobia/minzip/infinite-text-scroller?label=gzipped" />
+  <img src="https://img.shields.io/github/license/lledellebell/infinite-text-scroller" />
+  <img src="https://img.shields.io/github/workflow/status/lledellebell/infinite-text-scroller/CI" />
+  <img src="https://img.shields.io/npm/dm/infinite-text-scroller" />
+  <img src="https://img.shields.io/github/stars/lledellebell/infinite-text-scroller?style=social" />
+</p>
+
 의존성 없는 모던한 무한 텍스트 스크롤러 라이브러리
 
 ## 주요 기능
