@@ -35,7 +35,7 @@ export default [
     output: {
       file: 'dist/index.js',
       format: 'umd',
-      name: 'TextScrollerFactory',
+      name: 'InfiniteTextScroller',
       exports: 'named',
       sourcemap: true,
       banner
@@ -48,7 +48,7 @@ export default [
     output: {
       file: 'dist/index.debug.js',
       format: 'umd',
-      name: 'TextScrollerFactory',
+      name: 'InfiniteTextScroller',
       exports: 'named',
       sourcemap: true,
       banner

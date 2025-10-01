@@ -12,6 +12,7 @@ export class InfiniteTextScroller {
 
   static defaultConfig = {
     text: '',
+    html: '',
     direction: 'horizontal',
     speed: 20,
     fontSize: '1.2rem',
@@ -60,14 +61,21 @@ export class InfiniteTextScroller {
   // 비공개 헬퍼: 개별 스크롤러 아이템 생성
   static #createScrollerItem = (text, separator, direction, config) => {
     const item = InfiniteTextScroller.#createElement('div', 'its-scroller-item');
-    const textSpan = InfiniteTextScroller.#createElement('span', 'its-scroller-text', text);
-    
+    const textSpan = InfiniteTextScroller.#createElement('span', 'its-scroller-text');
+
     if (config.fontFamily) {
       textSpan.style.fontFamily = config.fontFamily;
     }
-    
+
+    // html 옵션이 있으면 innerHTML, 아니면 textContent
+    if (config.html) {
+      textSpan.innerHTML = config.html;
+    } else {
+      textSpan.textContent = text;
+    }
+
     item.appendChild(textSpan);
-    
+
     if (direction === 'horizontal' && separator) {
       const separatorSpan = InfiniteTextScroller.#createElement('span', 'its-scroller-separator', separator);
       if (config.separatorColor && config.separatorColor !== 'inherit') {
@@ -75,7 +83,7 @@ export class InfiniteTextScroller {
       }
       item.appendChild(separatorSpan);
     }
-    
+
     return item;
   };
 
@@ -356,8 +364,23 @@ export class InfiniteTextScroller {
 
       updateText: (newText) => {
         const items = track.querySelectorAll('.its-scroller-text');
-        items.forEach(item => item.textContent = newText);
+        items.forEach(item => {
+          if (instance.config.html) {
+            // html이 있으면 무시
+            return;
+          }
+          item.textContent = newText;
+        });
         instance.config.text = newText;
+        return instance;
+      },
+
+      updateHtml: (newHtml) => {
+        const items = track.querySelectorAll('.its-scroller-text');
+        items.forEach(item => {
+          item.innerHTML = newHtml;
+        });
+        instance.config.html = newHtml;
         return instance;
       },
 
@@ -393,7 +416,7 @@ export class InfiniteTextScroller {
 
       updateConfig: (newConfig) => {
         Object.assign(instance.config, newConfig);
-        
+
         const styleMap = {
           speed: '--its-animation-speed',
           fontSize: '--its-font-size',
@@ -416,7 +439,8 @@ export class InfiniteTextScroller {
           }
         });
 
-        if (newConfig.text) instance.updateText(newConfig.text);
+        if (newConfig.html !== undefined) instance.updateHtml(newConfig.html);
+        else if (newConfig.text !== undefined) instance.updateText(newConfig.text);
         if (newConfig.direction) instance.updateDirection(newConfig.direction);
         if (newConfig.fadeEdges !== undefined) {
           wrapper.classList.toggle('its-fade-enabled', newConfig.fadeEdges);
@@ -522,21 +546,3 @@ export const getScroller = InfiniteTextScroller.getInstance.bind(InfiniteTextScr
 export const destroyAllScrollers = InfiniteTextScroller.destroyAll.bind(InfiniteTextScroller);
 export const pauseAllScrollers = InfiniteTextScroller.pauseAll.bind(InfiniteTextScroller);
 export const playAllScrollers = InfiniteTextScroller.playAll.bind(InfiniteTextScroller);
-
-// UMD 빌드 지원
-(function (global, factory) {
-  if (typeof module === "object" && typeof module.exports === "object") {
-    module.exports = factory();
-  } else {
-    global.InfiniteTextScroller = factory();
-  }
-})(
-  typeof globalThis !== "undefined" ? globalThis
-    : typeof window !== "undefined" ? window
-    : typeof global !== "undefined" ? global
-    : typeof self !== "undefined" ? self
-    : Function("return this")(),
-  function () {
-    return InfiniteTextScroller;
-  }
-);
