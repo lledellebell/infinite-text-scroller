@@ -3,7 +3,6 @@
  * @version 1.0.0
  * @author deep
  * @description 무한 스크롤 텍스트 애니메이션을 위한 경량 라이브러리
- * @repository https://github.com/deep/infinite-text-scroller
  * @license MIT
  */
 
