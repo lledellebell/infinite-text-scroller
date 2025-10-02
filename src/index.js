@@ -41,6 +41,65 @@ export class InfiniteTextScroller {
     rtl: false
   };
 
+  // 비공개 헬퍼: HTML 새니타이징 (XSS 방지)
+  static #sanitizeHTML = (html) => {
+    const allowedTags = ['b', 'strong', 'i', 'em', 'u', 'span', 'br', 'mark'];
+    const allowedAttrs = ['style', 'class'];
+
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+
+    const walker = document.createTreeWalker(
+      temp,
+      NodeFilter.SHOW_ELEMENT,
+      null,
+      false
+    );
+
+    const nodesToRemove = [];
+    let node;
+
+    while ((node = walker.nextNode())) {
+      const tagName = node.tagName.toLowerCase();
+
+      if (!allowedTags.includes(tagName)) {
+        nodesToRemove.push(node);
+        continue;
+      }
+
+      const attrs = Array.from(node.attributes);
+      attrs.forEach(attr => {
+        if (!allowedAttrs.includes(attr.name.toLowerCase())) {
+          node.removeAttribute(attr.name);
+        }
+      });
+    }
+
+    nodesToRemove.forEach(node => {
+      const text = document.createTextNode(node.textContent);
+      node.parentNode.replaceChild(text, node);
+    });
+
+    return temp.innerHTML;
+  };
+
+  // 비공개 헬퍼: 숫자 파라미터 검증
+  static #validateNumber = (value, min, max, defaultValue, paramName) => {
+    if (typeof value !== 'number' || isNaN(value)) {
+      console.warn(`[TextScroller] ${paramName}는 숫자여야 합니다. 기본값(${defaultValue}) 사용`);
+      return defaultValue;
+    }
+    if (min !== null && value < min) {
+      console.warn(`[TextScroller] ${paramName}는 ${min} 이상이어야 합니다. 최소값 사용`);
+      return min;
+    }
+    if (max !== null && value > max) {
+      console.warn(`[TextScroller] ${paramName}는 ${max} 이하여야 합니다. 최대값 사용`);
+      return max;
+    }
+    return value;
+  };
+
   // 비공개 헬퍼: DOM 요소 생성
   static #createElement = (tag, className, textContent = '') => {
     const el = document.createElement(tag);
@@ -67,9 +126,9 @@ export class InfiniteTextScroller {
       textSpan.style.fontFamily = config.fontFamily;
     }
 
-    // html 옵션이 있으면 innerHTML, 아니면 textContent
+    // html 옵션이 있으면 innerHTML (새니타이징 적용), 아니면 textContent
     if (config.html) {
-      textSpan.innerHTML = config.html;
+      textSpan.innerHTML = InfiniteTextScroller.#sanitizeHTML(config.html);
     } else {
       textSpan.textContent = text;
     }
@@ -279,9 +338,15 @@ export class InfiniteTextScroller {
       return null;
     }
 
-    if (!config.text) {
-      console.warn('[TextScroller] text가 비어있습니다');
+    if (!config.text && !config.html) {
+      console.error('[TextScroller] text 또는 html 중 하나는 필수입니다');
+      return null;
     }
+
+    // 숫자 파라미터 검증
+    config.speed = InfiniteTextScroller.#validateNumber(config.speed, 0.1, 1000, 20, 'speed');
+    config.duplicates = InfiniteTextScroller.#validateNumber(config.duplicates, 1, 20, 3, 'duplicates');
+    config.separatorOpacity = InfiniteTextScroller.#validateNumber(config.separatorOpacity, 0, 1, 0.5, 'separatorOpacity');
 
     const container = document.getElementById(config.containerId);
     if (!container) {
@@ -363,10 +428,14 @@ export class InfiniteTextScroller {
       isPlaying: true,
 
       updateText: (newText) => {
+        if (typeof newText !== 'string') {
+          console.error('[TextScroller] updateText: 문자열 타입이 필요합니다');
+          return instance;
+        }
         const items = track.querySelectorAll('.its-scroller-text');
         items.forEach(item => {
           if (instance.config.html) {
-            // html이 있으면 무시
+            // html 모드에서는 무시
             return;
           }
           item.textContent = newText;
@@ -376,22 +445,32 @@ export class InfiniteTextScroller {
       },
 
       updateHtml: (newHtml) => {
+        if (typeof newHtml !== 'string') {
+          console.error('[TextScroller] updateHtml: 문자열 타입이 필요합니다');
+          return instance;
+        }
+        const sanitized = InfiniteTextScroller.#sanitizeHTML(newHtml);
         const items = track.querySelectorAll('.its-scroller-text');
         items.forEach(item => {
-          item.innerHTML = newHtml;
+          item.innerHTML = sanitized;
         });
         instance.config.html = newHtml;
         return instance;
       },
 
       updateSpeed: (newSpeed) => {
-        wrapper.style.setProperty('--its-animation-speed', `${newSpeed}s`);
-        track.style.animationDuration = `${newSpeed}s`;
-        instance.config.speed = newSpeed;
+        const validSpeed = InfiniteTextScroller.#validateNumber(newSpeed, 0.1, 1000, instance.config.speed, 'speed');
+        wrapper.style.setProperty('--its-animation-speed', `${validSpeed}s`);
+        track.style.animationDuration = `${validSpeed}s`;
+        instance.config.speed = validSpeed;
         return instance;
       },
 
       updateDirection: (newDirection) => {
+        if (!['horizontal', 'vertical'].includes(newDirection)) {
+          console.error('[TextScroller] updateDirection: "horizontal" 또는 "vertical"만 사용 가능합니다');
+          return instance;
+        }
         wrapper.classList.remove('its-horizontal', 'its-vertical');
         wrapper.classList.add(`its-${newDirection}`);
         instance.config.direction = newDirection;
@@ -439,9 +518,17 @@ export class InfiniteTextScroller {
           }
         });
 
-        if (newConfig.html !== undefined) instance.updateHtml(newConfig.html);
-        else if (newConfig.text !== undefined) instance.updateText(newConfig.text);
-        if (newConfig.direction) instance.updateDirection(newConfig.direction);
+        if (newConfig.html !== undefined) {
+          instance.updateHtml(newConfig.html);
+        } else if (newConfig.text !== undefined) {
+          instance.updateText(newConfig.text);
+        }
+        if (newConfig.direction) {
+          instance.updateDirection(newConfig.direction);
+        }
+        if (newConfig.speed !== undefined) {
+          instance.updateSpeed(newConfig.speed);
+        }
         if (newConfig.fadeEdges !== undefined) {
           wrapper.classList.toggle('its-fade-enabled', newConfig.fadeEdges);
         }
@@ -484,7 +571,22 @@ export class InfiniteTextScroller {
       },
 
       destroy: () => {
-        wrapper.remove();
+        // 애니메이션 정지
+        if (track) {
+          track.style.animation = 'none';
+        }
+
+        // DOM 제거
+        if (wrapper && wrapper.parentNode) {
+          wrapper.remove();
+        }
+
+        // 참조 해제 (메모리 누수 방지)
+        instance.element = null;
+        instance.track = null;
+        instance.container = null;
+
+        // 인스턴스 맵에서 제거
         InfiniteTextScroller.instances.delete(config.containerId);
       },
 
