@@ -1,6 +1,7 @@
 export interface ScrollerConfig {
   text?: string;
   html?: string;
+  children?: string;
   containerId: string;
   direction?: 'horizontal' | 'vertical';
   speed?: number;
@@ -38,6 +39,8 @@ export interface ScrollerInstance {
   config: ScrollerConfig;
   isPlaying: boolean;
   updateText: (newText: string) => ScrollerInstance;
+  updateHtml: (newHtml: string) => ScrollerInstance;
+  updateChildren: (newChildren: string) => ScrollerInstance;
   updateSpeed: (newSpeed: number) => ScrollerInstance;
   updateDirection: (newDirection: 'horizontal' | 'vertical') => ScrollerInstance;
   updateColors: (colors: { textColor?: string; backgroundColor?: string; borderColor?: string }) => ScrollerInstance;

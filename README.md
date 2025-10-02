@@ -50,11 +50,19 @@ npm run build
 ```js
 import InfiniteTextScroller from 'infinite-text-scroller';
 
+// 기본 사용
 const scroller = InfiniteTextScroller.create({
   text: '안녕하세요',
   containerId: 'scroller',
   speed: 20,
   direction: 'horizontal'
+});
+
+// 프리셋 사용 (가장 간단!)
+const newsScroller = InfiniteTextScroller.create({
+  text: '최신 뉴스 • 속보 업데이트 • 긴급 공지',
+  containerId: 'news-scroller',
+  preset: 'news'  // news, ticker, banner, alert, minimal
 });
 ```
 
@@ -91,9 +99,14 @@ import 'infinite-text-scroller/dist/styles.css';
 ### 설정 옵션
 | 옵션 | 타입 | 기본값 | 설명 |
 |------|------|--------|------|
+| **콘텐츠** ||||
 | text | string | '' | 표시할 텍스트 |
-| html | string | '' | 텍스트 대신 렌더링할 HTML. <br>이 옵션이 있으면 text 옵션은 무시됩니다. |
+| html | string | '' | 텍스트 대신 렌더링할 HTML |
+| children | string | '' | React children을 HTML 문자열로 변환한 값 (우선순위: children > html > text) |
 | containerId | string | 필수 | 컨테이너 요소 ID |
+| **프리셋** ||||
+| preset | string | - | 프리셋 이름 (minimal, news, ticker, banner, alert) |
+| **애니메이션** ||||
 | direction | 'horizontal' \| 'vertical' | 'horizontal' | 스크롤 방향 |
 | speed | number | 20 | 애니메이션 속도 (초) |
 | fontSize | string | '1.2rem' | 폰트 크기 |
@@ -123,6 +136,8 @@ import 'infinite-text-scroller/dist/styles.css';
 
 ### 인스턴스 메서드
 - updateText(newText) - 텍스트 업데이트
+- updateHtml(newHtml) - HTML 업데이트
+- updateChildren(newChildren) - children HTML 업데이트
 - updateSpeed(newSpeed) - 속도 업데이트
 - updateDirection(newDirection) - 방향 업데이트
 - updateColors(colors) - 색상 업데이트
@@ -189,13 +204,88 @@ python -m http.server 8080
 
 ## 예제 설명
 
-**예시**:
+### 기본 사용법
+
+**1. 프리셋 사용 (가장 간단!)**
 ```js
-const scroller = InfiniteTextScroller.createScroller({
+// 뉴스 스타일
+InfiniteTextScroller.create({
+  containerId: 'news',
+  text: '최신 뉴스 • 속보',
+  preset: 'news'
+});
+
+// 티커 스타일
+InfiniteTextScroller.create({
+  containerId: 'ticker',
+  text: 'AAPL: $150 ▲ | GOOGL: $2,850 ▼',
+  preset: 'ticker'
+});
+
+// 배너 스타일
+InfiniteTextScroller.create({
+  containerId: 'banner',
+  text: '🎉 특별 이벤트 진행중',
+  preset: 'banner'
+});
+```
+
+**사용 가능한 프리셋:**
+- `minimal` - 테두리/페이드 없는 심플한 스타일
+- `news` - 뉴스 티커 스타일
+- `ticker` - 주식/시세 스타일
+- `banner` - 프로모션 배너 스타일
+- `alert` - 경고/알림 스타일
+
+**2. HTML 모드**
+```js
+const scroller = InfiniteTextScroller.create({
   containerId: 'scroller1',
   html: '<b style="color:red;">중요 공지</b> <span>이벤트 안내</span>',
   direction: 'horizontal'
 });
+```
+
+**3. React children 방식 (권장)**
+```jsx
+import { InfiniteTextScrollerWrapper } from './InfiniteTextScrollerWrapper';
+
+// 프리셋 사용
+function App() {
+  return (
+    <InfiniteTextScrollerWrapper preset="news">
+      <span>최신 뉴스</span>
+      <span>속보 업데이트</span>
+    </InfiniteTextScrollerWrapper>
+  );
+}
+
+// 그룹화된 설정
+function App() {
+  return (
+    <InfiniteTextScrollerWrapper
+      animation={{ speed: 25, pauseOnHover: true }}
+      style={{ textColor: '#FF6B6B', backgroundColor: 'transparent' }}
+      effect={{ fadeEdges: true }}
+    >
+      <span>커스텀 컨텐츠</span>
+      <span className="font-bold">강조 텍스트</span>
+    </InfiniteTextScrollerWrapper>
+  );
+}
+
+// 개별 props (하위 호환성)
+function App() {
+  return (
+    <InfiniteTextScrollerWrapper
+      speed={20}
+      direction="horizontal"
+      textColor="#000"
+    >
+      <span>Custom content</span>
+    </InfiniteTextScrollerWrapper>
+  );
+}
 ```
 
 **basic.html**: 3가지 기본 스크롤러와 제어 버튼

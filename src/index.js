@@ -1,18 +1,19 @@
 /**
  * 무한 텍스트 스크롤러
- * @version 1.1.0
+ * @version 1.3.0
  * @author deep
  * @description 무한 스크롤 텍스트 애니메이션을 위한 경량 라이브러리
  * @license MIT
  */
 
 export class InfiniteTextScroller {
-  static VERSION = '1.1.0';
+  static VERSION = '1.3.0';
   static instances = new Map();
 
   static defaultConfig = {
     text: '',
     html: '',
+    children: '',
     direction: 'horizontal',
     speed: 20,
     fontSize: '1.2rem',
@@ -39,6 +40,50 @@ export class InfiniteTextScroller {
     animationTimingFunction: 'linear',
     animationDelay: '0s',
     rtl: false
+  };
+
+  // 프리셋 설정
+  static presets = {
+    minimal: {
+      borderTop: false,
+      borderBottom: false,
+      fadeEdges: false,
+      padding: '1rem',
+      backgroundColor: 'transparent'
+    },
+    news: {
+      speed: 15,
+      separator: '•',
+      borderTop: true,
+      borderBottom: true,
+      fadeEdges: true
+    },
+    ticker: {
+      speed: 10,
+      separator: '|',
+      separatorOpacity: 0.3,
+      fontSize: '1rem',
+      fadeEdges: true
+    },
+    banner: {
+      speed: 25,
+      separator: '—',
+      borderTop: false,
+      borderBottom: false,
+      fadeEdges: true,
+      fadeWidth: '100px',
+      padding: '2rem'
+    },
+    alert: {
+      speed: 12,
+      separator: '⚠',
+      separatorColor: '#ff0000',
+      textColor: '#ff0000',
+      backgroundColor: '#fff3cd',
+      borderTop: true,
+      borderBottom: true,
+      borderColor: '#ff0000'
+    }
   };
 
   // 비공개 헬퍼: HTML 새니타이징 (XSS 방지)
@@ -126,8 +171,10 @@ export class InfiniteTextScroller {
       textSpan.style.fontFamily = config.fontFamily;
     }
 
-    // html 옵션이 있으면 innerHTML (새니타이징 적용), 아니면 textContent
-    if (config.html) {
+    // children이 우선, 그 다음 html, 마지막으로 text
+    if (config.children) {
+      textSpan.innerHTML = InfiniteTextScroller.#sanitizeHTML(config.children);
+    } else if (config.html) {
       textSpan.innerHTML = InfiniteTextScroller.#sanitizeHTML(config.html);
     } else {
       textSpan.textContent = text;
@@ -327,10 +374,22 @@ export class InfiniteTextScroller {
   /**
    * 새로운 텍스트 스크롤러 인스턴스 생성
    * @param {Object} options - 설정 옵션
+   * @param {string} options.preset - 프리셋 이름 (minimal, news, ticker, banner, alert)
    * @returns {Object|null} 제어 메서드가 포함된 스크롤러 인스턴스
    */
   static create(options) {
-    const config = { ...InfiniteTextScroller.defaultConfig, ...options };
+    // 프리셋 적용
+    let presetConfig = {};
+    if (options.preset && InfiniteTextScroller.presets[options.preset]) {
+      presetConfig = InfiniteTextScroller.presets[options.preset];
+    }
+
+    // 우선순위: defaultConfig < preset < options
+    const config = {
+      ...InfiniteTextScroller.defaultConfig,
+      ...presetConfig,
+      ...options
+    };
 
     // 필수 옵션 검증
     if (!config.containerId) {
@@ -338,8 +397,8 @@ export class InfiniteTextScroller {
       return null;
     }
 
-    if (!config.text && !config.html) {
-      console.error('[TextScroller] text 또는 html 중 하나는 필수입니다');
+    if (!config.text && !config.html && !config.children) {
+      console.error('[TextScroller] text, html, children 중 하나는 필수입니다');
       return null;
     }
 
@@ -493,6 +552,20 @@ export class InfiniteTextScroller {
         return instance;
       },
 
+      updateChildren: (newChildren) => {
+        if (typeof newChildren !== 'string') {
+          console.error('[TextScroller] updateChildren: 문자열 타입이 필요합니다');
+          return instance;
+        }
+        const sanitized = InfiniteTextScroller.#sanitizeHTML(newChildren);
+        const items = track.querySelectorAll('.its-scroller-text');
+        items.forEach(item => {
+          item.innerHTML = sanitized;
+        });
+        instance.config.children = newChildren;
+        return instance;
+      },
+
       updateConfig: (newConfig) => {
         Object.assign(instance.config, newConfig);
 
@@ -518,7 +591,9 @@ export class InfiniteTextScroller {
           }
         });
 
-        if (newConfig.html !== undefined) {
+        if (newConfig.children !== undefined) {
+          instance.updateChildren(newConfig.children);
+        } else if (newConfig.html !== undefined) {
           instance.updateHtml(newConfig.html);
         } else if (newConfig.text !== undefined) {
           instance.updateText(newConfig.text);

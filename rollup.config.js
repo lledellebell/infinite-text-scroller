@@ -3,7 +3,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
 
 const banner = `/*!
- * Infinite Text Scroller v1.1.0
+ * Infinite Text Scroller v1.3.0
  * (c) ${new Date().getFullYear()} deep
  * Released under the MIT License
  */`;
