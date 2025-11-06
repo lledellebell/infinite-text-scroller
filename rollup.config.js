@@ -1,3 +1,4 @@
+import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
 
@@ -11,13 +12,22 @@ export default [
   // ESM 빌드 (모던 번들러용)
   {
     input: 'src/index.js',
-    output: {
-      file: 'dist/index.esm.js',
-      format: 'esm',
-      sourcemap: true,
-      banner
-    },
-    plugins: [resolve()]
+    output: [
+      {
+        file: 'dist/index.js',
+        format: 'umd',
+        name: 'InfiniteTextScroller',
+        exports: 'named'
+      },
+      {
+        file: 'dist/index.esm.js',
+        format: 'esm'
+      }
+    ],
+    plugins: [
+      resolve(),
+      babel({ babelHelpers: 'bundled' })
+    ]
   },
   // UMD 빌드 (브라우저용, 압축됨)
   {
@@ -25,7 +35,7 @@ export default [
     output: {
       file: 'dist/index.js',
       format: 'umd',
-      name: 'TextScrollerFactory',
+      name: 'InfiniteTextScroller',
       exports: 'named',
       sourcemap: true,
       banner
@@ -38,7 +48,7 @@ export default [
     output: {
       file: 'dist/index.debug.js',
       format: 'umd',
-      name: 'TextScrollerFactory',
+      name: 'InfiniteTextScroller',
       exports: 'named',
       sourcemap: true,
       banner

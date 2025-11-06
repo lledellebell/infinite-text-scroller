@@ -1,5 +1,6 @@
 export interface ScrollerConfig {
-  text: string;
+  text?: string;
+  html?: string;
   containerId: string;
   direction?: 'horizontal' | 'vertical';
   speed?: number;
@@ -50,7 +51,7 @@ export interface ScrollerInstance {
   getState: () => { isPlaying: boolean; config: ScrollerConfig };
 }
 
-export class TextScrollerFactory {
+export class InfiniteTextScroller {
   static VERSION: string;
   static instances: Map<string, ScrollerInstance>;
   static defaultConfig: ScrollerConfig;
@@ -63,7 +64,7 @@ export class TextScrollerFactory {
   static injectStyles(): void;
 }
 
-export default TextScrollerFactory;
+export default InfiniteTextScroller;
 
 export function createScroller(options: ScrollerConfig): ScrollerInstance | null;
 export function getScroller(containerId: string): ScrollerInstance | undefined;

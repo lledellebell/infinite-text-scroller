@@ -38,7 +38,7 @@
 
   <div class="example-section">
     <h2>공지사항 (세로)</h2>
-    <div id="announcements" style="height: 150px;"></div>
+    <div id="announcements" style="height: 50px;overflow-y: hidden;"></div>
   </div>
 
   <div class="example-section">
@@ -53,7 +53,7 @@
   <script src="../dist/index.js"></script>
   <script>
     // 1. 뉴스 티커
-    const newsTicker = InfiniteTextScroller.create({
+    const newsTicker = InfiniteTextScroller.createScroller({
       containerId: 'news-ticker',
       text: '속보: 새로운 무한 스크롤러 라이브러리 출시! 개발자들 사이에서 큰 인기.',
       backgroundColor: '#1a237e',
@@ -62,7 +62,7 @@
     });
 
     // 2. 프로모션 배너
-    const promoBanner = InfiniteTextScroller.create({
+    const promoBanner = InfiniteTextScroller.createScroller({
       containerId: 'promo-banner',
       text: '기간 한정 세일! 모든 상품 20% 할인!',
       speed: 15,
@@ -73,7 +73,7 @@
     });
 
     // 3. 주식 시세 (자동 업데이스트)
-    const stockTicker = InfiniteTextScroller.create({
+    const stockTicker = InfiniteTextScroller.createScroller({
       containerId: 'stock-ticker',
       text: '코스피 2,800.12 ▲15.45 (+0.55%) | 나스닥 17,857.02 ▼32.23 (-0.18%)',
       speed: 10,
@@ -88,7 +88,7 @@
     }, 5000);
 
     // 4. 공지사항 (세로)
-    const announcements = InfiniteTextScroller.create({
+    const announcements = InfiniteTextScroller.createScroller({
       containerId: 'announcements',
       text: '시스템 점검 안내: 10월 5일 오전 2시 ~ 4시 | 새로운 기능 업데이스트 안내: 10월 10일 예정',
       direction: 'vertical',
@@ -97,9 +97,9 @@
     });
 
     // 5. 이벤트 배너 (지연 시작)
-    const eventBanner = InfiniteTextScroller.create({
+    const eventBanner = InfiniteTextScroller.createScroller({
       containerId: 'event-banner',
-      text: '곧 시작되는 이벤트! 놓치지 마세요!',
+      html: '<strong>곧 시작되는 <span style="color:#ffd600;">이벤트!</span></strong> <em>놓치지 마세요!</em>',
       animationDelay: '3s',
       backgroundColor: '#4caf50',
       textColor: '#ffffff',
@@ -107,7 +107,7 @@
     });
 
     // 6. RTL 지원
-    const rtlScroller = InfiniteTextScroller.create({
+    const rtlScroller = InfiniteTextScroller.createScroller({
       containerId: 'rtl-scroller',
       text: 'هذا مثال على التمرير من اليمين إلى اليسار.',
       rtl: true,

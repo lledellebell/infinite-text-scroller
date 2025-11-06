@@ -1,6 +1,6 @@
 {
   "name": "infinite-text-scroller",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A modern, lightweight infinite text scroller library with factory pattern and zero dependencies",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -20,7 +20,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "npm run build:js && npm run build:types && npm run build:css",
+    "build": "npm run build:js && npm run build:types && npm run build:css && echo 'Build complete!' && babel src --out-dir dist",
     "build:js": "rollup -c",
     "build:types": "node scripts/copy-types.js",
     "build:css": "node scripts/extract-css.js",
@@ -42,9 +42,13 @@
   "author": "lledellebell",
   "license": "MIT",
   "devDependencies": {
+    "@babel/cli": "^7.28.3",
+    "@babel/core": "^7.28.4",
+    "@babel/preset-env": "^7.28.3",
+    "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-node-resolve": "^15.3.1",
     "@rollup/plugin-terser": "^0.4.4",
-    "eslint": "^8.0.0",
+    "eslint": "^8.57.1",
     "jest": "^29.0.0",
     "rollup": "^3.29.5",
     "rollup-plugin-postcss": "^4.0.0"

@@ -41,12 +41,12 @@
 
   <script src="../dist/index.js"></script>
   <script>
-    const scroller1 = InfiniteTextScroller.create({
+    const scroller1 = InfiniteTextScroller.createScroller({
       containerId: 'scroller1',
       text: '일반 가로 스크롤러 예제입니다. 마우스를 올리면 멈춥니다.',
     });
 
-    const scroller2 = InfiniteTextScroller.create({
+    const scroller2 = InfiniteTextScroller.createScroller({
       containerId: 'scroller2',
       text: '이 스크롤러는 매우 빠르게 움직입니다!',
       speed: 5,
@@ -54,7 +54,7 @@
       backgroundColor: '#F1FAEE',
     });
 
-    const scroller3 = InfiniteTextScroller.create({
+    const scroller3 = InfiniteTextScroller.createScroller({
       containerId: 'scroller3',
       text: '세로 스크롤러 예제입니다. 텍스트가 위로 올라갑니다.',
       direction: 'vertical',

@@ -1,5 +1,14 @@
 # Infinite Text Scroller
 
+<p align="center">
+  <img src="https://img.shields.io/npm/v/infinite-text-scroller?color=blue&label=npm" />
+  <img src="https://img.shields.io/bundlephobia/minzip/infinite-text-scroller?label=gzipped" />
+  <img src="https://img.shields.io/github/license/lledellebell/infinite-text-scroller" />
+  <img src="https://img.shields.io/github/workflow/status/lledellebell/infinite-text-scroller/CI" />
+  <img src="https://img.shields.io/npm/dm/infinite-text-scroller" />
+  <img src="https://img.shields.io/github/stars/lledellebell/infinite-text-scroller?style=social" />
+</p>
+
 의존성 없는 모던한 무한 텍스트 스크롤러 라이브러리
 
 ## 주요 기능
@@ -83,6 +92,7 @@ import 'infinite-text-scroller/dist/styles.css';
 | 옵션 | 타입 | 기본값 | 설명 |
 |------|------|--------|------|
 | text | string | '' | 표시할 텍스트 |
+| html | string | '' | 텍스트 대신 렌더링할 HTML. <br>이 옵션이 있으면 text 옵션은 무시됩니다. |
 | containerId | string | 필수 | 컨테이너 요소 ID |
 | direction | 'horizontal' \| 'vertical' | 'horizontal' | 스크롤 방향 |
 | speed | number | 20 | 애니메이션 속도 (초) |
@@ -177,7 +187,16 @@ python -m http.server 8080
 # http://localhost:8080/examples/advanced.html
 ```
 
-## 예제 설명(추가예정)
+## 예제 설명
+
+**예시**:
+```js
+const scroller = InfiniteTextScroller.createScroller({
+  containerId: 'scroller1',
+  html: '<b style="color:red;">중요 공지</b> <span>이벤트 안내</span>',
+  direction: 'horizontal'
+});
+```
 
 **basic.html**: 3가지 기본 스크롤러와 제어 버튼
 - 일반 가로 스크롤러
