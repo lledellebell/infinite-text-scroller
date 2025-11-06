@@ -1,0 +1,232 @@
+/* Infinite Text Scroller v1.4.0 */
+/* WCAG 2.2.2 준수, Fade 애니메이션, prefers-reduced-motion 지원 */
+
+.its-scroller-container {
+  position: relative;
+}
+
+.its-scroller-container.its-border-top {
+  border-block-start: var(--its-border-width, 1px) solid var(--its-border-color, #000000);
+}
+
+.its-scroller-container.its-border-bottom {
+  border-block-end: var(--its-border-width, 1px) solid var(--its-border-color, #000000);
+}
+
+.its-scroller-container:not(:last-child).its-border-bottom {
+  border-block-end: none;
+}
+
+/* 키보드 포커스 표시 (WCAG 2.4.7) */
+.its-scroller-container:focus {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}
+
+.its-scroller-container:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.its-scroller-wrapper {
+  overflow: hidden;
+  display: flex;
+  position: relative;
+  padding-block: var(--its-padding, clamp(1rem, 2vw, 2rem));
+  isolation: isolate;
+  background-color: var(--its-bg-color, #ffffff);
+}
+
+/* Fade 타입 스타일 */
+.its-scroller-wrapper.its-fade-type {
+  justify-content: center;
+  align-items: center;
+  min-height: 48px;
+}
+
+.its-scroller-wrapper.its-fade-type .its-scroller-track {
+  animation: none;
+}
+
+.its-scroller-wrapper::before,
+.its-scroller-wrapper::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inline-size: var(--its-fade-width, clamp(60px, 10vw, 100px));
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.its-scroller-wrapper.its-fade-enabled::before,
+.its-scroller-wrapper.its-fade-enabled::after {
+  opacity: 1;
+}
+
+.its-scroller-wrapper.its-horizontal::before {
+  inset-inline-start: 0;
+  background: linear-gradient(to right, var(--its-bg-color, #ffffff), transparent);
+}
+
+.its-scroller-wrapper.its-horizontal::after {
+  inset-inline-end: 0;
+  background: linear-gradient(to left, var(--its-bg-color, #ffffff), transparent);
+}
+
+.its-scroller-wrapper.its-rtl.its-horizontal .its-scroller-track {
+  flex-direction: row-reverse;
+}
+
+.its-scroller-wrapper.its-vertical {
+  block-size: var(--its-vertical-height, clamp(250px, 30vh, 300px));
+  align-items: center;
+  justify-content: center;
+}
+
+.its-scroller-wrapper.its-vertical::before {
+  inline-size: 100%;
+  block-size: 60px;
+  background: linear-gradient(to bottom, var(--its-bg-color, #ffffff), transparent);
+}
+
+.its-scroller-wrapper.its-vertical::after {
+  inline-size: 100%;
+  block-size: 60px;
+  background: linear-gradient(to top, var(--its-bg-color, #ffffff), transparent);
+  inset-block-start: auto;
+  inset-block-end: 0;
+}
+
+.its-scroller-track {
+  display: flex;
+  animation-duration: var(--its-animation-speed, 20s);
+  animation-timing-function: var(--its-animation-timing, linear);
+  animation-iteration-count: infinite;
+  animation-delay: var(--its-animation-delay, 0s);
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.its-scroller-wrapper.its-horizontal .its-scroller-track {
+  animation-name: its-scroll-horizontal;
+}
+
+.its-scroller-wrapper.its-vertical .its-scroller-track {
+  flex-direction: column;
+  animation-name: its-scroll-vertical;
+}
+
+.its-scroller-wrapper:hover .its-scroller-track.its-pause-on-hover {
+  animation-play-state: paused;
+}
+
+/* 애니메이션 상태 제어 클래스 (WCAG 2.2.2) */
+.its-scroller-track.its-paused {
+  animation-play-state: paused !important;
+}
+
+.its-scroller-track.its-reset {
+  animation: none !important;
+}
+
+.its-scroller-item {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.its-scroller-wrapper.its-vertical .its-scroller-item {
+  flex-direction: column;
+  padding-block: calc(var(--its-padding, 1rem) / 2);
+}
+
+/* Fade 타입 아이템 */
+.its-scroller-wrapper.its-fade-type .its-scroller-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+  pointer-events: none;
+  width: 100%;
+  max-width: 800px;
+  justify-content: center;
+  text-align: center;
+}
+
+.its-scroller-wrapper.its-fade-type .its-scroller-item.its-active {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+
+.its-scroller-wrapper.its-fade-type .its-scroller-item.its-prev {
+  opacity: 0;
+  transform: translate(-50%, -65%);
+}
+
+.its-scroller-wrapper.its-fade-type .its-scroller-item.its-next {
+  opacity: 0;
+  transform: translate(-50%, -35%);
+}
+
+.its-scroller-text {
+  padding-inline: var(--its-gap, calc(var(--its-padding, 1rem) * 2));
+  font-size: var(--its-font-size, 1.2rem);
+  font-weight: var(--its-font-weight, 400);
+  font-family: var(--its-font-family, inherit);
+  color: var(--its-text-color, #000000);
+  letter-spacing: var(--its-letter-spacing, -0.01em);
+  user-select: none;
+}
+
+.its-scroller-separator {
+  color: var(--its-separator-color, var(--its-text-color, #000000));
+  font-size: var(--its-font-size, 1.2rem);
+  padding-inline: 0.5rem;
+  user-select: none;
+  opacity: var(--its-separator-opacity, 0.5);
+}
+
+@keyframes its-scroll-horizontal {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes its-scroll-vertical {
+  from { transform: translateY(0); }
+  to { transform: translateY(-50%); }
+}
+
+/* prefers-reduced-motion 지원 (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+  .its-scroller-track {
+    animation-duration: 60s !important;
+  }
+
+  .its-scroller-wrapper.its-fade-type .its-scroller-item {
+    position: relative !important;
+    opacity: 1 !important;
+    transform: none !important;
+    display: block;
+    margin-bottom: 0.5rem;
+    pointer-events: auto;
+  }
+
+  .its-scroller-wrapper.its-fade-type {
+    display: block;
+    overflow-y: auto;
+    max-height: 200px;
+  }
+}
+
+@media (forced-colors: active) {
+  .its-scroller-wrapper::before,
+  .its-scroller-wrapper::after {
+    display: none;
+  }
+}

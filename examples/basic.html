@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>기본 스크롤러 예제</title>
+  <style>
+    body { font-family: sans-serif; background-color: #f9f9f9; color: #333; }
+    button { margin-right: 0.5rem; background-color: #ffffff; border: 1px solid #333; padding: 0.5rem 1rem; cursor: pointer; border-radius: 10px; }
+    button:hover { background-color: #f0f0f0; }
+    button:active { background-color: #e0e0e0; }
+    h1, h2 { color: #333; text-align: center; }
+    h1 { margin-bottom: 2rem;}
+    .scroller-container { margin-bottom: 4rem; }
+    .controls { margin: 1rem auto; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <h1>기본 스크롤러 예제</h1>
+
+  <div class="scroller-container">
+    <h2>일반 가로 스크롤러</h2>
+    <div id="scroller1"></div>
+    <div class="controls">
+      <button onclick="scroller1.pause()">일시정지</button>
+      <button onclick="scroller1.play()">재생</button>
+      <button onclick="scroller1.toggle()">토글</button>
+    </div>
+  </div>
+
+  <div class="scroller-container">
+    <h2>빠른 속도 스크롤러</h2>
+    <div id="scroller2"></div>
+  </div>
+
+  <div class="scroller-container">
+    <h2>세로 스크롤러</h2>
+    <div id="scroller3" style="height: 200px;"></div>
+  </div>
+
+  <script src="../dist/index.js"></script>
+  <script>
+    const scroller1 = InfiniteTextScroller.create({
+      containerId: 'scroller1',
+      text: '일반 가로 스크롤러 예제입니다. 마우스를 올리면 멈춥니다.',
+    });
+
+    const scroller2 = InfiniteTextScroller.create({
+      containerId: 'scroller2',
+      text: '이 스크롤러는 매우 빠르게 움직입니다!',
+      speed: 5,
+      textColor: '#E63946',
+      backgroundColor: '#F1FAEE',
+    });
+
+    const scroller3 = InfiniteTextScroller.create({
+      containerId: 'scroller3',
+      text: '세로 스크롤러 예제입니다. 텍스트가 위로 올라갑니다.',
+      direction: 'vertical',
+      speed: 4,
+      fontSize: '1.5rem',
+      padding: '1rem',
+    });
+  </script>
+
+</body>
+</html>
