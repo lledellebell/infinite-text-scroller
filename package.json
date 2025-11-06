@@ -1,7 +1,7 @@
 {
   "name": "infinite-text-scroller",
-  "version": "1.1.0",
-  "description": "A modern, lightweight infinite text scroller library with factory pattern and zero dependencies",
+  "version": "1.4.0",
+  "description": "A modern, lightweight infinite text scroller library with WCAG accessibility, fade animations, and zero dependencies",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
@@ -20,14 +20,14 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "npm run build:js && npm run build:types && npm run build:css && echo 'Build complete!' && babel src --out-dir dist",
-    "build:js": "rollup -c",
+    "build": "rollup -c",
     "build:types": "node scripts/copy-types.js",
     "build:css": "node scripts/extract-css.js",
     "dev": "rollup -c -w",
     "test": "jest",
     "lint": "eslint src/**/*.js",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "publish:github": "cp package-github.json package.json.bak && cp package-github.json package.json && npm publish && mv package.json.bak package.json"
   },
   "keywords": [
     "scroller",

@@ -1,15 +1,7 @@
 import { writeFileSync, mkdirSync } from 'fs';
 
-const css = `/* Infinite Text Scroller Styles */
-:root {
-  --its-color-bg: #ffffff;
-  --its-color-text: #000000;
-  --its-color-border: #000000;
-  --its-spacing-base: clamp(1rem, 2vw, 2rem);
-  --its-font-size-base: clamp(1rem, 1.2vw, 1.2rem);
-  --its-border-width: 1px;
-  --its-fade-width: clamp(60px, 10vw, 100px);
-}
+const css = `/* Infinite Text Scroller v1.4.0 */
+/* WCAG 2.2.2 준수, Fade 애니메이션, prefers-reduced-motion 지원 */
 
 .its-scroller-container {
   position: relative;
@@ -27,6 +19,16 @@ const css = `/* Infinite Text Scroller Styles */
   border-block-end: none;
 }
 
+/* 키보드 포커스 표시 (WCAG 2.4.7) */
+.its-scroller-container:focus {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}
+
+.its-scroller-container:focus:not(:focus-visible) {
+  outline: none;
+}
+
 .its-scroller-wrapper {
   overflow: hidden;
   display: flex;
@@ -34,6 +36,17 @@ const css = `/* Infinite Text Scroller Styles */
   padding-block: var(--its-padding, clamp(1rem, 2vw, 2rem));
   isolation: isolate;
   background-color: var(--its-bg-color, #ffffff);
+}
+
+/* Fade 타입 스타일 */
+.its-scroller-wrapper.its-fade-type {
+  justify-content: center;
+  align-items: center;
+  min-height: 48px;
+}
+
+.its-scroller-wrapper.its-fade-type .its-scroller-track {
+  animation: none;
 }
 
 .its-scroller-wrapper::before,
@@ -89,7 +102,9 @@ const css = `/* Infinite Text Scroller Styles */
 
 .its-scroller-track {
   display: flex;
-  animation: its-scroll var(--its-animation-timing, linear) infinite;
+  animation-duration: var(--its-animation-speed, 20s);
+  animation-timing-function: var(--its-animation-timing, linear);
+  animation-iteration-count: infinite;
   animation-delay: var(--its-animation-delay, 0s);
   will-change: transform;
   backface-visibility: hidden;
@@ -109,6 +124,15 @@ const css = `/* Infinite Text Scroller Styles */
   animation-play-state: paused;
 }
 
+/* 애니메이션 상태 제어 클래스 (WCAG 2.2.2) */
+.its-scroller-track.its-paused {
+  animation-play-state: paused !important;
+}
+
+.its-scroller-track.its-reset {
+  animation: none !important;
+}
+
 .its-scroller-item {
   display: inline-flex;
   align-items: center;
@@ -121,17 +145,49 @@ const css = `/* Infinite Text Scroller Styles */
   padding-block: calc(var(--its-padding, 1rem) / 2);
 }
 
+/* Fade 타입 아이템 */
+.its-scroller-wrapper.its-fade-type .its-scroller-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+  pointer-events: none;
+  width: 100%;
+  max-width: 800px;
+  justify-content: center;
+  text-align: center;
+}
+
+.its-scroller-wrapper.its-fade-type .its-scroller-item.its-active {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+
+.its-scroller-wrapper.its-fade-type .its-scroller-item.its-prev {
+  opacity: 0;
+  transform: translate(-50%, -65%);
+}
+
+.its-scroller-wrapper.its-fade-type .its-scroller-item.its-next {
+  opacity: 0;
+  transform: translate(-50%, -35%);
+}
+
 .its-scroller-text {
   padding-inline: var(--its-gap, calc(var(--its-padding, 1rem) * 2));
   font-size: var(--its-font-size, 1.2rem);
   font-weight: var(--its-font-weight, 400);
+  font-family: var(--its-font-family, inherit);
   color: var(--its-text-color, #000000);
   letter-spacing: var(--its-letter-spacing, -0.01em);
   user-select: none;
 }
 
 .its-scroller-separator {
-  color: var(--its-text-color, #000000);
+  color: var(--its-separator-color, var(--its-text-color, #000000));
   font-size: var(--its-font-size, 1.2rem);
   padding-inline: 0.5rem;
   user-select: none;
@@ -148,9 +204,25 @@ const css = `/* Infinite Text Scroller Styles */
   to { transform: translateY(-50%); }
 }
 
+/* prefers-reduced-motion 지원 (WCAG 2.3.3) */
 @media (prefers-reduced-motion: reduce) {
   .its-scroller-track {
     animation-duration: 60s !important;
+  }
+
+  .its-scroller-wrapper.its-fade-type .its-scroller-item {
+    position: relative !important;
+    opacity: 1 !important;
+    transform: none !important;
+    display: block;
+    margin-bottom: 0.5rem;
+    pointer-events: auto;
+  }
+
+  .its-scroller-wrapper.its-fade-type {
+    display: block;
+    overflow-y: auto;
+    max-height: 200px;
   }
 }
 

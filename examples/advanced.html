@@ -1,120 +1,931 @@
+<!-- TODO: 케이스별 스타일 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> 스크롤러 예제</title>
+  <title>Infinite Text Scroller | Examples</title>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
-    body { font-family: sans-serif; background-color: #f0f2f5; color: #333; margin: 0;}
-    h1, h2 { text-align: center; color: #1a237e; }
-    .example-section { 
-      margin: 2rem auto;
-      padding: 2rem;
-      background-color: #fff;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    :root {
+      --bg-primary: #fafafa;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f5f5f5;
+      --border-color: #e5e5e5;
+      --text-primary: #000000;
+      --text-secondary: #666666;
+      --text-tertiary: #999999;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #1a1a1a;
+      --bg-tertiary: #2a2a2a;
+      --border-color: #333333;
+      --text-primary: #ffffff;
+      --text-secondary: #888888;
+      --text-tertiary: #666666;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 3rem 0;
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .container {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    header h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+
+    .theme-toggle {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .theme-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .theme-btn:hover {
+      border-color: var(--text-primary);
+    }
+
+    .theme-btn.active {
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      border-color: var(--text-primary);
+    }
+
+    .theme-btn i {
+      width: 16px;
+      height: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+      align-items: start;
+    }
+
+    .example-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
       border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      max-width: 90%;
+      overflow: hidden;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-header {
+      padding: 1.25rem 1.5rem;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .card-header h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.25rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-header h3 i,
+    .card-header h3 [data-lucide] {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2;
+      flex-shrink: 0;
+    }
+
+    .card-header p {
+      color: var(--text-tertiary);
+      font-size: 0.85rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .badge-live {
+      background: #dc2626;
+      color: #ffffff;
+    }
+
+    .badge-wcag {
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+    }
+
+    .badge-pro {
+      background: var(--text-primary);
+      color: var(--bg-primary);
+    }
+
+    .ticker-wrapper {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ticker-content {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .ticker-content img {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .ticker-content i,
+    .ticker-content [data-lucide] {
+      flex-shrink: 0;
+    }
+
+    .ticker-content a {
+      color: inherit;
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    .ticker-content a:hover {
+      border-bottom-color: currentColor;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.6rem;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .status-badge i,
+    .status-badge [data-lucide] {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    .price-up { color: #22c55e; font-weight: 600; }
+    .price-down { color: #ef4444; font-weight: 600; }
+
+    /* 모든 Lucide 아이콘에 기본 크기 지정 */
+    [data-lucide] {
+      width: 18px;
+      height: 18px;
+    }
+
+    .theme-btn [data-lucide] {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* 1. 뉴스 속보 - 긴급성 */
+    #news-card .ticker-wrapper::before {
+      content: '';
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 8px;
+      background: #dc2626;
+      border-radius: 50%;
+      animation: pulse-dot 2s infinite;
+      z-index: 1;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1);
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+      }
+      50% {
+        opacity: 0.7;
+        transform: translateY(-50%) scale(1.2);
+        box-shadow: 0 0 0 6px rgba(220, 38, 38, 0);
+      }
+    }
+
+    #news-card .ticker-wrapper {
+      padding-left: 2rem;
+    }
+
+    /* 2. 긴급 공지 - 경고 */
+    #alert-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(180deg, transparent, #f59e0b, transparent);
+      animation: alert-glow 2s infinite;
+    }
+
+    @keyframes alert-glow {
+      0%, 100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      50% {
+        opacity: 0.4;
+        transform: translateY(50%);
+      }
+    }
+
+    /* 3. 금융 티커 - 전문성 */
+    #finance-card .card-header {
+      background: var(--bg-tertiary);
+    }
+
+    #finance-card .ticker-wrapper {
+      font-family: 'SF Mono', 'Monaco', monospace;
+      letter-spacing: -0.02em;
+    }
+
+    #finance-card .ticker-wrapper::after {
+      content: '';
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 2px;
+      height: 60%;
+      background: linear-gradient(180deg, transparent, #22c55e, transparent);
+      animation: data-stream 1.5s infinite;
+    }
+
+    @keyframes data-stream {
+      0% { opacity: 0; transform: translateY(-50%) scaleY(0); }
+      50% { opacity: 1; transform: translateY(-50%) scaleY(1); }
+      100% { opacity: 0; transform: translateY(50%) scaleY(1); }
+    }
+
+    /* 4. 이벤트 배너 - 화려함 */
+    #event-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #8b5cf6, transparent);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    #event-card .ticker-wrapper {
+      background: linear-gradient(90deg, var(--bg-secondary) 0%, var(--bg-tertiary) 50%, var(--bg-secondary) 100%);
+      background-size: 200% 100%;
+      animation: gradient-flow 4s infinite;
+    }
+
+    @keyframes gradient-flow {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* 5. 시스템 상태 - 기술적 */
+    #system-card {
+      font-family: 'SF Mono', 'Monaco', monospace;
+    }
+
+    #system-card .ticker-wrapper::before {
+      content: '';
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 6px;
+      background: #06b6d4;
+      border-radius: 50%;
+      animation: status-blink 2s infinite;
+    }
+
+    @keyframes status-blink {
+      0%, 49%, 100% { opacity: 1; box-shadow: 0 0 8px #06b6d4; }
+      50%, 99% { opacity: 0.3; box-shadow: 0 0 0 #06b6d4; }
+    }
+
+    #system-card .ticker-wrapper {
+      padding-left: 2rem;
+    }
+
+    /* 6. 소셜 피드 - 친근함 */
+    #social-card .ticker-wrapper::after {
+      content: '';
+      position: absolute;
+      right: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 4px;
+      background: #ec4899;
+      border-radius: 50%;
+      animation: activity-pulse 1.5s infinite;
+    }
+
+    @keyframes activity-pulse {
+      0%, 100% { opacity: 1; transform: translateY(-50%) scale(1); }
+      50% { opacity: 0.2; transform: translateY(-50%) scale(1.5); }
+    }
+
+    /* 7. 스포츠 스코어 - 역동성 */
+    #sports-card .ticker-wrapper {
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    #sports-card .card-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: repeating-linear-gradient(90deg, var(--text-primary) 0px, var(--text-primary) 10px, transparent 10px, transparent 20px);
+    }
+
+    /* 8. 날씨 정보 - 부드러움 */
+    #weather-card {
+      border-radius: 10px;
+    }
+
+    #weather-card .card-header {
+      border-radius: 10px 10px 0 0;
+    }
+
+    #weather-card .ticker-wrapper {
+      background: linear-gradient(to right, var(--bg-secondary) 0%, var(--bg-tertiary) 50%, var(--bg-secondary) 100%);
+      border-radius: 0 0 10px 10px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--text-tertiary);
+      padding: 2rem;
+      margin-top: 3rem;
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+
+    footer a:hover {
+      opacity: 0.6;
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 2rem 0; }
+      .grid { grid-template-columns: 1fr; gap: 1.5rem; }
+      header { margin-bottom: 2rem; }
+      .theme-toggle { flex-wrap: wrap; }
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <header>
+      <h1>Infinite Text Scroller</h1>
+      <p>실제 서비스에서 사용되는 다양한 형태의 스크롤러 예제</p>
 
-  <h1> 스크롤러 사용 사례</h1>
+      <div class="theme-toggle">
+        <button class="theme-btn" data-theme="light">
+          <i data-lucide="sun"></i>
+          <span>Light</span>
+        </button>
+        <button class="theme-btn active" data-theme="system">
+          <i data-lucide="monitor"></i>
+          <span>System</span>
+        </button>
+        <button class="theme-btn" data-theme="dark">
+          <i data-lucide="moon"></i>
+          <span>Dark</span>
+        </button>
+      </div>
+    </header>
 
-  <div class="example-section">
-    <h2>뉴스 티커</h2>
-    <div id="news-ticker"></div>
-  </div>
+    <div class="grid">
+      <!-- 1. 뉴스 속보 -->
+      <div class="example-card" id="news-card">
+        <div class="card-header">
+          <h3>
+            <i data-lucide="newspaper"></i>
+            뉴스 속보
+            <span class="badge badge-live">Live</span>
+          </h3>
+          <p>실시간 뉴스 링크</p>
+        </div>
+        <div class="ticker-wrapper">
+          <div id="news-ticker"></div>
+        </div>
+      </div>
 
-  <div class="example-section">
-    <h2>프로모션 배너</h2>
-    <div id="promo-banner"></div>
-  </div>
+      <!-- 2. 긴급 공지 -->
+      <div class="example-card" id="alert-card">
+        <div class="card-header">
+          <h3>
+            <i data-lucide="alert-triangle"></i>
+            긴급 공지
+            <span class="badge badge-wcag">Important</span>
+          </h3>
+          <p>중요 시스템 알림</p>
+        </div>
+        <div class="ticker-wrapper">
+          <div id="alert-ticker"></div>
+        </div>
+      </div>
 
-  <div class="example-section">
-    <h2>주식 시세 (자동 업데이트)</h2>
-    <div id="stock-ticker"></div>
-  </div>
+      <!-- 3. 금융 티커 -->
+      <div class="example-card" id="finance-card">
+        <div class="card-header">
+          <h3>
+            <i data-lucide="trending-up"></i>
+            실시간 시세
+            <span class="badge badge-pro">Pro</span>
+          </h3>
+          <p>주식 시장 데이터</p>
+        </div>
+        <div class="ticker-wrapper">
+          <div id="finance-ticker"></div>
+        </div>
+      </div>
 
-  <div class="example-section">
-    <h2>공지사항 (세로)</h2>
-    <div id="announcements" style="height: 50px;overflow-y: hidden;"></div>
-  </div>
+      <!-- 4. 이벤트 배너 -->
+      <div class="example-card" id="event-card">
+        <div class="card-header">
+          <h3>
+            <i data-lucide="gift"></i>
+            이벤트 안내
+            <span class="badge badge-live">New</span>
+          </h3>
+          <p>진행 중인 프로모션</p>
+        </div>
+        <div class="ticker-wrapper">
+          <div id="event-ticker"></div>
+        </div>
+      </div>
 
-  <div class="example-section">
-    <h2>이벤트 배너 (지연 시작)</h2>
-    <div id="event-banner"></div>
-  </div>
+      <!-- 5. 시스템 상태 -->
+      <div class="example-card" id="system-card">
+        <div class="card-header">
+          <h3>
+            <i data-lucide="server"></i>
+            시스템 모니터
+            <span class="badge badge-wcag">Tech</span>
+          </h3>
+          <p>서버 상태 모니터링</p>
+        </div>
+        <div class="ticker-wrapper">
+          <div id="system-ticker"></div>
+        </div>
+      </div>
 
-  <div class="example-section">
-    <h2>RTL 지원</h2>
+      <!-- 6. 소셜 피드 -->
+      <div class="example-card" id="social-card">
+        <div class="card-header">
+          <h3>
+            <i data-lucide="message-circle"></i>
+            소셜 피드
+            <span class="badge badge-live">Live</span>
+          </h3>
+          <p>사용자 활동 피드</p>
+        </div>
+        <div class="ticker-wrapper">
+          <div id="social-ticker"></div>
+        </div>
+      </div>
+
+      <!-- 7. 스포츠 스코어 -->
+      <div class="example-card" id="sports-card">
+        <div class="card-header">
+          <h3>
+            <i data-lucide="trophy"></i>
+            스포츠 스코어
+            <span class="badge badge-live">Live</span>
+          </h3>
+          <p>실시간 경기 결과</p>
+        </div>
+        <div class="ticker-wrapper">
+          <div id="sports-ticker"></div>
+        </div>
+      </div>
+
+      <!-- 8. 날씨 정보 -->
+      <div class="example-card" id="weather-card">
+        <div class="card-header">
+          <h3>
+            <i data-lucide="cloud-sun"></i>
+            날씨 정보
+            <span class="badge badge-wcag">Weather</span>
+          </h3>
+          <p>전국 날씨 현황</p>
+        </div>
+        <div class="ticker-wrapper">
+          <div id="weather-ticker"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>
+        Built with
+        <a href="https://github.com/lledellebell/infinite-text-scroller" target="_blank">Infinite Text Scroller</a>
+        v1.4.0
+      </p>
+    </footer>
   </div>
 
   <script src="../dist/index.js"></script>
   <script>
-    // 1. 뉴스 티커
-    const newsTicker = InfiniteTextScroller.createScroller({
+    // 테마 관리
+    const themeButtons = document.querySelectorAll('.theme-btn');
+    const html = document.documentElement;
+    const savedTheme = localStorage.getItem('theme') || 'system';
+
+    function getSystemTheme() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function applyTheme(theme) {
+      if (theme === 'system') {
+        html.setAttribute('data-theme', getSystemTheme());
+      } else {
+        html.setAttribute('data-theme', theme);
+      }
+      themeButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.theme === theme));
+      localStorage.setItem('theme', theme);
+    }
+
+    applyTheme(savedTheme);
+
+    themeButtons.forEach(btn => {
+      btn.addEventListener('click', () => applyTheme(btn.dataset.theme));
+    });
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      if (localStorage.getItem('theme') === 'system') applyTheme('system');
+    });
+
+    const ITS = InfiniteTextScroller.default || InfiniteTextScroller;
+
+    // 초기 아이콘 렌더링
+    lucide.createIcons();
+
+    // 1. 뉴스 속보
+    ITS.create({
       containerId: 'news-ticker',
-      text: '속보: 새로운 무한 스크롤러 라이브러리 출시! 개발자들 사이에서 큰 인기.',
-      backgroundColor: '#1a237e',
-      textColor: '#ffffff',
-      fontSize: '1rem',
-    });
-
-    // 2. 프로모션 배너
-    const promoBanner = InfiniteTextScroller.createScroller({
-      containerId: 'promo-banner',
-      text: '기간 한정 세일! 모든 상품 20% 할인!',
-      speed: 15,
-      fontSize: '2rem',
-      fontWeight: 'bold',
-      backgroundColor: '#ffc107',
-      textColor: '#000000',
-    });
-
-    // 3. 주식 시세 (자동 업데이스트)
-    const stockTicker = InfiniteTextScroller.createScroller({
-      containerId: 'stock-ticker',
-      text: '코스피 2,800.12 ▲15.45 (+0.55%) | 나스닥 17,857.02 ▼32.23 (-0.18%)',
-      speed: 10,
-      pauseOnHover: false,
-    });
-    setInterval(() => {
-      const newPrice = (Math.random() * 100 - 50).toFixed(2);
-      const sign = newPrice >= 0 ? '▲' : '▼';
-      const change = Math.abs(newPrice);
-      const newText = `코스피 2,800.12 ${sign}${change} | 나스닥 17,857.02 ${sign === '▲' ? '▼' : '▲'}${change / 2}`; 
-      stockTicker.updateText(newText);
-    }, 5000);
-
-    // 4. 공지사항 (세로)
-    const announcements = InfiniteTextScroller.createScroller({
-      containerId: 'announcements',
-      text: '시스템 점검 안내: 10월 5일 오전 2시 ~ 4시 | 새로운 기능 업데이스트 안내: 10월 10일 예정',
-      direction: 'vertical',
-      speed: 6,
-      padding: '0.5rem'
-    });
-
-    // 5. 이벤트 배너 (지연 시작)
-    const eventBanner = InfiniteTextScroller.createScroller({
-      containerId: 'event-banner',
-      html: '<strong>곧 시작되는 <span style="color:#ffd600;">이벤트!</span></strong> <em>놓치지 마세요!</em>',
-      animationDelay: '3s',
-      backgroundColor: '#4caf50',
-      textColor: '#ffffff',
+      html: `
+        <span class="ticker-content">
+          <a href="#">속보: 글로벌 AI 기술 혁신이 산업 전반을 변화시키고 있습니다</a>
+        </span>
+        <span class="ticker-content">
+          <a href="#">경제: 주요 증시 상승세 지속, 투자 심리 개선</a>
+        </span>
+        <span class="ticker-content">
+          <a href="#">사회: 환경 보호를 위한 새로운 정책 발표</a>
+        </span>
+      `,
+      speed: 18,
+      separator: '•',
+      fontSize: '0.95rem',
       fontWeight: '500',
+      textColor: 'var(--text-primary)',
+      backgroundColor: 'transparent',
+      borderTop: false,
+      borderBottom: false,
+      fadeEdges: true,
+      pauseOnHover: true,
+      ariaLabel: '뉴스 속보'
     });
+    lucide.createIcons();
 
-    // 6. RTL 지원
-    const rtlScroller = InfiniteTextScroller.createScroller({
-      containerId: 'rtl-scroller',
-      text: 'هذا مثال على التمرير من اليمين إلى اليسار.',
-      rtl: true,
-      fontFamily: 'Tahoma, Arial, sans-serif',
-      backgroundColor: '#333',
+    // 2. 긴급 공지
+    ITS.create({
+      containerId: 'alert-ticker',
+      html: `
+        <span class="ticker-content">
+          <span class="status-badge" style="background:#f59e0b;color:#fff;">
+            <i data-lucide="alert-circle"></i> 중요
+          </span>
+          시스템 정기 점검이 오늘 자정에 예정되어 있습니다
+        </span>
+      `,
+      speed: 20,
+      separator: '',
+      fontSize: '0.95rem',
+      fontWeight: '600',
+      textColor: '#f59e0b',
+      backgroundColor: 'transparent',
+      borderTop: false,
+      borderBottom: false,
+      fadeEdges: true,
+      pauseOnHover: true,
+      ariaLabel: '긴급 공지'
     });
+    lucide.createIcons();
+
+    // 3. 금융 티커
+    ITS.create({
+      containerId: 'finance-ticker',
+      html: `
+        <span class="ticker-content">
+          <img src="https://placehold.co/24/000000/FFFFFF?text=A" alt="AAPL">
+          AAPL <span class="price-up"><i data-lucide="trending-up"></i> $175.43 +2.1%</span>
+        </span>
+        <span class="ticker-content">
+          <img src="https://placehold.co/24/4285F4/FFFFFF?text=G" alt="GOOGL">
+          GOOGL <span class="price-up"><i data-lucide="trending-up"></i> $138.21 +1.8%</span>
+        </span>
+        <span class="ticker-content">
+          <img src="https://placehold.co/24/00A4EF/FFFFFF?text=M" alt="MSFT">
+          MSFT <span class="price-up"><i data-lucide="trending-up"></i> $378.91 +0.9%</span>
+        </span>
+        <span class="ticker-content">
+          <img src="https://placehold.co/24/E31937/FFFFFF?text=T" alt="TSLA">
+          TSLA <span class="price-down"><i data-lucide="trending-down"></i> $248.50 -1.2%</span>
+        </span>
+      `,
+      speed: 25,
+      separator: '|',
+      fontSize: '0.9rem',
+      fontWeight: '500',
+      textColor: 'var(--text-primary)',
+      backgroundColor: 'transparent',
+      borderTop: false,
+      borderBottom: false,
+      fadeEdges: true,
+      pauseOnHover: true,
+      ariaLabel: '실시간 주식 시세'
+    });
+    lucide.createIcons();
+
+    // 4. 이벤트 배너
+    ITS.create({
+      containerId: 'event-ticker',
+      html: `
+        <span class="ticker-content">
+          <span class="status-badge" style="background:#8b5cf6;color:#fff;">
+            <i data-lucide="sparkles"></i> NEW
+          </span>
+          <a href="#">특별 할인 이벤트 최대 50% 할인</a>
+        </span>
+        <span class="ticker-content">
+          <span class="status-badge" style="background:#8b5cf6;color:#fff;">
+            <i data-lucide="gift"></i> GIFT
+          </span>
+          <a href="#">신규 가입 시 10,000 포인트 즉시 지급</a>
+        </span>
+      `,
+      speed: 22,
+      separator: '•',
+      fontSize: '1rem',
+      fontWeight: '600',
+      textColor: '#8b5cf6',
+      backgroundColor: 'transparent',
+      borderTop: false,
+      borderBottom: false,
+      fadeEdges: true,
+      pauseOnHover: true,
+      ariaLabel: '이벤트 배너'
+    });
+    lucide.createIcons();
+
+    // 5. 시스템 상태
+    ITS.create({
+      containerId: 'system-ticker',
+      html: `
+        <span class="ticker-content">
+          <span class="status-badge" style="background:#22c55e;color:#fff;">
+            <i data-lucide="check-circle"></i> OK
+          </span>
+          All services operational
+        </span>
+        <span class="ticker-content">
+          <span class="status-badge"><i data-lucide="cpu"></i> CPU</span>
+          45%
+        </span>
+        <span class="ticker-content">
+          <span class="status-badge"><i data-lucide="hard-drive"></i> Memory</span>
+          62%
+        </span>
+        <span class="ticker-content">
+          <span class="status-badge"><i data-lucide="clock"></i> Uptime</span>
+          99.9%
+        </span>
+      `,
+      speed: 28,
+      separator: '|',
+      fontSize: '0.85rem',
+      fontWeight: '400',
+      textColor: '#06b6d4',
+      backgroundColor: 'transparent',
+      borderTop: false,
+      borderBottom: false,
+      fadeEdges: true,
+      pauseOnHover: true,
+      ariaLabel: '시스템 상태'
+    });
+    lucide.createIcons();
+
+    // 6. 소셜 피드
+    ITS.create({
+      containerId: 'social-ticker',
+      html: `
+        <span class="ticker-content">
+          <img src="https://i.pravatar.cc/24?img=1" alt="user1">
+          <strong>@user1</strong>님이 새 게시물을 공유했습니다
+          <i data-lucide="share-2" style="width:14px;height:14px;"></i>
+        </span>
+        <span class="ticker-content">
+          <img src="https://i.pravatar.cc/24?img=2" alt="user2">
+          <strong>@user2</strong>님이 댓글을 남겼습니다
+          <i data-lucide="message-square" style="width:14px;height:14px;"></i>
+        </span>
+        <span class="ticker-content">
+          <img src="https://i.pravatar.cc/24?img=3" alt="user3">
+          <strong>@user3</strong>님이 좋아요를 눌렀습니다
+          <i data-lucide="heart" style="width:14px;height:14px;"></i>
+        </span>
+      `,
+      speed: 20,
+      separator: '|',
+      fontSize: '0.9rem',
+      fontWeight: '400',
+      textColor: '#ec4899',
+      backgroundColor: 'transparent',
+      borderTop: false,
+      borderBottom: false,
+      fadeEdges: true,
+      pauseOnHover: true,
+      ariaLabel: '소셜 피드'
+    });
+    lucide.createIcons();
+
+    // 7. 스포츠 스코어
+    ITS.create({
+      containerId: 'sports-ticker',
+      html: `
+        <span class="ticker-content">
+          <img src="https://placehold.co/24/DA291C/FFFFFF?text=M" alt="MU">
+          <strong>맨체스터 유나이티드</strong> 2 - 1 리버풀
+          <img src="https://placehold.co/24/C8102E/FFFFFF?text=L" alt="LIV">
+        </span>
+        <span class="ticker-content">
+          <img src="https://placehold.co/24/FEBE10/000000?text=R" alt="RM">
+          <strong>레알 마드리드</strong> 3 - 0 바르셀로나
+          <img src="https://placehold.co/24/004D98/FFFFFF?text=B" alt="BAR">
+        </span>
+        <span class="ticker-content">
+          <img src="https://placehold.co/24/DC052D/FFFFFF?text=BY" alt="BAY">
+          <strong>바이에른 뮌헨</strong> 1 - 1 도르트문트
+          <img src="https://placehold.co/24/FDE100/000000?text=D" alt="DOR">
+        </span>
+      `,
+      speed: 24,
+      separator: '•',
+      fontSize: '0.95rem',
+      fontWeight: '700',
+      textColor: 'var(--text-primary)',
+      backgroundColor: 'transparent',
+      borderTop: false,
+      borderBottom: false,
+      fadeEdges: true,
+      pauseOnHover: true,
+      ariaLabel: '스포츠 스코어'
+    });
+    lucide.createIcons();
+
+    // 8. 날씨 정보
+    ITS.create({
+      containerId: 'weather-ticker',
+      html: `
+        <span class="ticker-content">
+          <i data-lucide="sun" style="width:18px;height:18px;color:#f59e0b;"></i>
+          서울 23°C 맑음
+        </span>
+        <span class="ticker-content">
+          <i data-lucide="cloud" style="width:18px;height:18px;color:var(--text-secondary);"></i>
+          부산 25°C 흐림
+        </span>
+        <span class="ticker-content">
+          <i data-lucide="cloud-sun" style="width:18px;height:18px;color:#f59e0b;"></i>
+          대구 24°C 구름조금
+        </span>
+        <span class="ticker-content">
+          <i data-lucide="cloud-drizzle" style="width:18px;height:18px;color:#3b82f6;"></i>
+          인천 22°C 가끔 비
+        </span>
+      `,
+      speed: 22,
+      separator: '|',
+      fontSize: '0.9rem',
+      fontWeight: '500',
+      textColor: '#3b82f6',
+      backgroundColor: 'transparent',
+      borderTop: false,
+      borderBottom: false,
+      fadeEdges: true,
+      pauseOnHover: true,
+      ariaLabel: '날씨 정보'
+    });
+    lucide.createIcons();
+
+    // 모든 스크롤러 초기화 후 최종 아이콘 렌더링
+    setTimeout(() => {
+      lucide.createIcons();
+    }, 200);
   </script>
-
 </body>
 </html>
